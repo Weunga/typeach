@@ -4,7 +4,7 @@
  * 
  * @package YoduPlayer
  * @author Jrotty
- * @version 2.5.6
+ * @version 2.6.5
  * @link https://github.com/jrotty/YoduPlayer
  */
 class YoduPlayer_Plugin implements Typecho_Plugin_Interface
@@ -50,7 +50,17 @@ $sxj = new Typecho_Widget_Helper_Form_Element_Radio(
         $form->addInput($getype);
         
         $gedan = new Typecho_Widget_Helper_Form_Element_Text('gedan', NULL, 
-'',_t('请输入歌单id'), _t('填写该项后，播放器将使用这里的歌曲忽略上方的歌曲列表设置，如果发现突然歌曲全部无法播放，可以禁用重启插件(清除缓存)填写歌单再次尝试'));
+'',_t('请输入歌单id'), _t('填写该项后，播放器将使用这里的歌曲忽略上方的歌曲列表设置，如果发现突然歌曲全部无法播放，可以禁用重启插件(清除缓存)填写歌单再次尝试<div style="
+    padding: 10px;
+    background: #2a2a2a;
+    color: #fff;
+    border-radius: 5px;margin-top: 10px;"
+ ><b style="color:#03a9f4;display:block; font-size:18px">什么是歌单id？</b>
+网易云某歌单网址为：https://music.163.com/#/playlist?id=7694448425<br>
+则他的歌单id就是：7694448425<br>
+QQ音乐某歌单网址为：https://y.qq.com/n/ryqq/playlist/7467921318<br>
+则他的歌单id就是：7467921318<br>
+</div>'));
         $form->addInput($gedan);
         
         $t = new Typecho_Widget_Helper_Form_Element_Text(
@@ -66,7 +76,7 @@ $sxj = new Typecho_Widget_Helper_Form_Element_Radio(
     
     public static function personalConfig(Typecho_Widget_Helper_Form $form){}
     public static function header(){
-        $cssUrl = Helper::options()->pluginUrl . '/YoduPlayer/css/player.css?239';
+        $cssUrl = Helper::options()->pluginUrl . '/YoduPlayer/css/player.css?265';
         echo '<link rel="stylesheet" href="' . $cssUrl . '">';
         $css="";
 if(Helper::options()->Plugin('YoduPlayer')->top){
@@ -81,14 +91,14 @@ if(Helper::options()->Plugin('YoduPlayer')->sxj=='0'){
     public static function footer(){
         $options = Helper::options()->plugin('YoduPlayer'); 
 if(empty($options->musicList)){
-    $gqlb='{title:"未设置歌曲",artist:"",mp3:"'.Helper::options()->pluginUrl . '/YoduPlayer/images/huaq.mp3",cover:"'.Helper::options()->pluginUrl . '/YoduPlayer/images/moren.jpg",},';}else{$gqlb=$options->musicList;}
+    $gqlb='{title:"未设置歌曲",artist:"",mp3:"'.Helper::options()->pluginUrl . '/YoduPlayer/images/tixing.mp3",cover:"'.Helper::options()->pluginUrl . '/YoduPlayer/images/loading.svg",},';}else{$gqlb=$options->musicList;}
 		echo '
 <div id="bgmplayer" class="bgmplayer">
 <span class="bgmbuttom"  onClick="qiehuan();" >
 <svg viewBox="0 0 20 20" fill="currentColor" id="music-note" class="ydicon"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"></path></svg>
 </span>
 <div id="bgmpanel">
-<div class="bgmfm" onclick="playbtu();"><img id="ydfm" class="Rotation paused" src="" onerror=\'javascript:this.src="'.Helper::options()->pluginUrl . '/YoduPlayer/images/moren.jpg";this.onerror=null;\' alt="歌曲封面"></div>
+<div class="bgmfm" onclick="playbtu();"><img id="ydfm" class="Rotation paused" src="" onerror=\'javascript:this.src="'.Helper::options()->pluginUrl . '/YoduPlayer/images/loading.svg";this.onerror=null;\' alt="歌曲封面"></div>
 <div class="bgmtitle"><span id="ydtitle"></span></div>
 <div class="bgmtime"><span id="ytime">0:00</span></div>
 <div class="bgmbtn">
@@ -98,10 +108,13 @@ if(empty($options->musicList)){
 <span onclick="liebiao();"><svg viewBox="0 0 20 20" fill="currentColor" class="ydicon"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg></span>
 </div>
 </div><div id="jindu"></div>
-		<ul id="playlist" class="yhidden"></ul></div>
+		<ul id="playlist" class="yhidden"></ul>
+<div class="board"><div class="blurred" id="yodubg"></div></div>		
+		</div>
              ';
 if(empty($options->gedan)){
         echo '<script data-no-instant>
+const yoduplayerpath="'.Helper::options()->pluginUrl.'/YoduPlayer";
 const yaudio = new Audio();
 yaudio.loop = false;
 yaudio.volume = 0.68;
@@ -123,6 +136,7 @@ $rewrite='';if(Helper::options()->rewrite==0){$rewrite='index.php/';}
 $apiurl=Helper::options()->rootUrl.'/'.$rewrite.'yoduapi';
     ?>
   <script data-no-instant>
+const yoduplayerpath="<?php echo Helper::options()->pluginUrl; ?>/YoduPlayer";
 const yaudio = new Audio();
 yaudio.loop = false;
 yaudio.volume = 0.68; 
@@ -137,8 +151,8 @@ var musicApi=[
     <?php
 }
 
-        echo '<script  src="'.Helper::options()->pluginUrl . '/YoduPlayer/js/player.js?253" data-no-instant></script>' . "\n";
-        echo '<script  src="'.Helper::options()->pluginUrl . '/YoduPlayer/js/prpr.js?253"></script>' . "\n";        
+        echo '<script  src="'.Helper::options()->pluginUrl . '/YoduPlayer/js/player.js?265" data-no-instant></script>' . "\n";
+        echo '<script  src="'.Helper::options()->pluginUrl . '/YoduPlayer/js/prpr.js?265"></script>' . "\n";        
     }
 
 	public static function deleteFile()
